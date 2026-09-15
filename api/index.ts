@@ -11,15 +11,15 @@ import { envFromRecord } from "../src/env.ts";
 import { handleRequest } from "../src/handler.ts";
 import { createRuntime, type Runtime } from "../src/runtime.ts";
 
-export const runtime = "edge";
+export const config = { runtime: "edge" };
 
-let runtime: Runtime | null = null;
+let appRuntime: Runtime | null = null;
 let initError: Error | null = null;
 
 export default async function handler(request: Request): Promise<Response> {
-  if (!runtime && !initError) {
+  if (!appRuntime && !initError) {
     try {
-      runtime = createRuntime({ config: dropConfig, env: envFromRecord(process.env) });
+      appRuntime = createRuntime({ config: dropConfig, env: envFromRecord(process.env) });
     } catch (error) {
       initError = error instanceof Error ? error : new Error(String(error));
     }
@@ -35,5 +35,5 @@ export default async function handler(request: Request): Promise<Response> {
     );
   }
 
-  return handleRequest(request, runtime as Runtime);
+  return handleRequest(request, appRuntime as Runtime);
 }
